@@ -12,17 +12,18 @@ import io.netty.handler.codec.string.StringDecoder;
 public class NettySimpleServer {
 
     public static void main(String[] args) {
-
+        NioEventLoopGroup boss = new NioEventLoopGroup();
+        NioEventLoopGroup worker = new NioEventLoopGroup(2);
         new ServerBootstrap()
-                .group(new NioEventLoopGroup())
+                .group(boss, worker)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
-                    protected void initChannel(NioSocketChannel sc) throws Exception {
+                    protected void initChannel(NioSocketChannel sc) {
                         sc.pipeline().addLast(new StringDecoder())
                                 .addLast(new ChannelInboundHandlerAdapter() {
                                     @Override
-                                    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+                                    public void channelRead(ChannelHandlerContext ctx, Object msg) {
                                         System.out.println(msg);
                                     }
                                 });
